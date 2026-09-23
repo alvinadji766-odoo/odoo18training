@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- MASTER TAGS -->
+    <record id="tag_urgent" model="command.playground.tag">
+        <field name="name">Urgent</field>
+        <field name="color">1</field>
+    </record>
+    <record id="tag_training" model="command.playground.tag">
+        <field name="name">Training</field>
+        <field name="color">4</field>
+    </record>
+    <record id="tag_backend" model="command.playground.tag">
+        <field name="name">Backend</field>
+        <field name="color">7</field>
+    </record>
+
+    <!-- INITIAL PLAYGROUND SESSION -->
+    <record id="playground_session_demo" model="command.playground">
+        <field name="name">Interactive ORM Commands Playground</field>
+        <field name="last_command">Ready to test!</field>
+        <field name="code_snippet"># Klik salah satu tombol Command di header untuk melihat hasil eksekusi dan kode Python.</field>
+        <field name="execution_log">Selamat datang di ORM Command Playground! Modul ini dirancang khusus untuk mencoba dan mempelajari efek nyata dari 7 jenis Command ORM Odoo.</field>
+        <field name="tag_ids" eval="[Command.link(ref('tag_urgent')), Command.link(ref('tag_training'))]"/>
+    </record>
+
+    <record id="playground_line_1" model="command.playground.line">
+        <field name="playground_id" ref="playground_session_demo"/>
+        <field name="name">Sample Item #1</field>
+        <field name="quantity">2</field>
+        <field name="price">10000.0</field>
+    </record>
+    <record id="playground_line_2" model="command.playground.line">
+        <field name="playground_id" ref="playground_session_demo"/>
+        <field name="name">Sample Item #2</field>
+        <field name="quantity">1</field>
+        <field name="price">50000.0</field>
+    </record>
+</odoo>
+

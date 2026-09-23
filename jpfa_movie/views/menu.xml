@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_movie_root" name="Movies" sequence="50"
+              web_icon="movie_catalog,static/description/icon.png"/>
+
+    <menuitem id="menu_movie_main" name="Movies" parent="menu_movie_root" sequence="10"/>
+    <menuitem id="menu_movie_movie" name="Movies" parent="menu_movie_main"
+              action="action_movie_movie" sequence="10"/>
+    <menuitem id="menu_movie_review" name="Reviews" parent="menu_movie_main"
+              action="action_movie_review" sequence="20"/>
+
+    <menuitem id="menu_movie_config" name="Configuration" parent="menu_movie_root"
+              sequence="90" groups="group_movie_manager"/>
+    <menuitem id="menu_movie_genre" name="Genres" parent="menu_movie_config"
+              action="action_movie_genre" sequence="10"/>
+    <menuitem id="menu_movie_artist" name="Artists" parent="menu_movie_config"
+              action="action_movie_artist" sequence="20"/>
+    <menuitem id="menu_movie_studio" name="Studios" parent="menu_movie_config"
+              action="action_movie_studio" sequence="30"/>
+</odoo>

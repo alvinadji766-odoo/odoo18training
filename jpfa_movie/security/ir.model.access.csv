@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_movie_movie_user,movie.movie user,model_movie_movie,group_movie_user,1,1,1,0
+access_movie_movie_manager,movie.movie manager,model_movie_movie,group_movie_manager,1,1,1,1
+access_movie_genre_user,movie.genre user,model_movie_genre,group_movie_user,1,0,0,0
+access_movie_genre_manager,movie.genre manager,model_movie_genre,group_movie_manager,1,1,1,1
+access_movie_artist_user,movie.artist user,model_movie_artist,group_movie_user,1,0,0,0
+access_movie_artist_manager,movie.artist manager,model_movie_artist,group_movie_manager,1,1,1,1
+access_movie_studio_user,movie.studio user,model_movie_studio,group_movie_user,1,0,0,0
+access_movie_studio_manager,movie.studio manager,model_movie_studio,group_movie_manager,1,1,1,1
+access_movie_review_user,movie.review user,model_movie_review,group_movie_user,1,1,1,1
+access_movie_review_manager,movie.review manager,model_movie_review,group_movie_manager,1,1,1,1
+access_movie_fetch_api_wizard_user,movie.fetch.api.wizard user,model_movie_fetch_api_wizard,group_movie_user,1,1,1,1
+

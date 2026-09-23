@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_command_playground_all,command.playground.all,model_command_playground,base.group_user,1,1,1,1
+access_command_playground_line_all,command.playground.line.all,model_command_playground_line,base.group_user,1,1,1,1
+access_command_playground_tag_all,command.playground.tag.all,model_command_playground_tag,base.group_user,1,1,1,1
+access_command_custom_runner_wizard_all,command.custom.runner.wizard.all,model_command_custom_runner_wizard,base.group_user,1,1,1,1
+
+

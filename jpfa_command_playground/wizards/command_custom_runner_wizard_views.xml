@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_command_custom_runner_wizard_form" model="ir.ui.view">
+        <field name="name">command.custom.runner.wizard.form</field>
+        <field name="model">command.custom.runner.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Custom ORM Command Runner">
+                <field name="playground_id" invisible="1"/>
+                <field name="playground_tag_ids" invisible="1"/>
+
+                <div class="alert alert-primary py-2" role="alert">
+                    <strong>⚙️ Custom Command Builder:</strong> Pilih operasi command dan isi nilai <i>values</i> sendiri untuk melihat bagaimana data relasi bertransformasi secara <i>live</i>.
+                </div>
+
+                <group>
+                    <group string="1. Target &amp; Operasi Command">
+                        <field name="target_field" widget="radio"/>
+                        <field name="command_type"/>
+                    </group>
+                </group>
+
+                <!-- SECTION 2: DYNAMIC INPUTS BERDASARKAN COMMAND -->
+                <group string="2. Input Custom Values">
+                    <!-- COMMAND 0: CREATE LINE -->
+                    <group invisible="command_type != '0' or target_field != 'line_ids'">
+                        <field name="line_name"/>
+                        <field name="line_qty"/>
+                        <field name="line_price"/>
+                    </group>
+
+                    <!-- COMMAND 0: CREATE TAG -->
+                    <group invisible="command_type != '0' or target_field != 'tag_ids'">
+                        <field name="tag_name"/>
+                        <field name="tag_color" widget="color_picker"/>
+                    </group>
+
+                    <!-- COMMAND 1: UPDATE LINE -->
+                    <group invisible="command_type != '1' or target_field != 'line_ids'">
+                        <field name="target_line_id" options="{'no_create': True}"/>
+                        <field name="new_line_name"/>
+                        <field name="new_line_qty"/>
+                        <field name="new_line_price"/>
+                    </group>
+
+                    <!-- COMMAND 1: UPDATE TAG -->
+                    <group invisible="command_type != '1' or target_field != 'tag_ids'">
+                        <field name="target_tag_id" options="{'no_create': True}"/>
+                    </group>
+
+                    <!-- COMMAND 2: DELETE LINE -->
+                    <group invisible="command_type != '2'">
+                        <field name="delete_line_id" options="{'no_create': True}"/>
+                    </group>
+
+                    <!-- COMMAND 3: UNLINK TAG -->
+                    <group invisible="command_type != '3'">
+                        <field name="target_tag_id" options="{'no_create': True}"/>
+                    </group>
+
+                    <!-- COMMAND 4: LINK TAG -->
+                    <group invisible="command_type != '4'">
+                        <field name="available_tag_id"/>
+                    </group>
+
+                    <!-- COMMAND 6: SET TAGS -->
+                    <group invisible="command_type != '6'">
+                        <field name="set_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    </group>
+
+                    <!-- RAW EXPRESSION -->
+                    <group invisible="command_type != 'raw'">
+                        <field name="raw_expression" widget="text" style="font-family: monospace;"/>
+                    </group>
+                </group>
+
+                <!-- SECTION 3: LIVE PREVIEW -->
+                <group string="3. Live Python Code Preview">
+                    <field name="code_preview" nolabel="1" widget="text"
+                           style="font-family: monospace; font-size: 0.9rem; background-color: #212529; color: #00ff66; padding: 10px; border-radius: 6px;"/>
+                </group>
+
+                <footer>
+                    <button name="action_execute_custom_command" string="▶ Execute Custom Command"
+                            type="object" class="btn-primary" icon="fa-play"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_command_custom_runner_wizard" model="ir.actions.act_window">
+        <field name="name">Run Custom Command</field>
+        <field name="res_model">command.custom.runner.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
+

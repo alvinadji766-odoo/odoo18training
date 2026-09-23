@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_movie_fetch_api_wizard_form" model="ir.ui.view">
+        <field name="name">movie.fetch.api.wizard.form</field>
+        <field name="model">movie.fetch.api.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Movie from REST API (Inspector)">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,fetched"/>
+                </header>
+                <sheet>
+                    <!-- ============================================================= -->
+                    <!-- STEP 1: SETUP & INSPECT REQUEST                              -->
+                    <!-- ============================================================= -->
+                    <div invisible="state != 'draft'">
+                        <div class="alert alert-info py-2" role="alert">
+                            <strong>📡 REST API Inspector (Step 1: Setup &amp; Inspect Request):</strong><br/>
+                            Tentukan judul film dan tipe koneksi. Anda dapat melihat detail parameter dan header HTTP
+                            yang akan dikirim ke server sebelum request dieksekusi.
+                        </div>
+
+                        <group>
+                            <group string="Pencarian Film">
+                                <field name="search_query" placeholder="contoh: Batman, Inception, Spider-Man, Matrix"/>
+                                <field name="source_type" widget="radio"/>
+                            </group>
+                            <group string="Endpoint Destination">
+                                <field name="http_method"/>
+                                <field name="api_endpoint" widget="char" readonly="1"
+                                       style="font-family: monospace; font-size: 0.85rem; color: #0d6efd;"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="🌐 HTTP Request Details (Inspector)">
+                                <group col="2">
+                                    <group string="Query Parameters (JSON)">
+                                        <field name="request_params" nolabel="1" widget="text"
+                                               style="font-family: monospace; font-size: 0.85rem; background: #212529; color: #38d9a9; padding: 10px; border-radius: 6px;"/>
+                                    </group>
+                                    <group string="Request Headers (JSON)">
+                                        <field name="request_headers" nolabel="1" widget="text"
+                                               style="font-family: monospace; font-size: 0.85rem; background: #212529; color: #69db7c; padding: 10px; border-radius: 6px;"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </div>
+
+                    <!-- ============================================================= -->
+                    <!-- STEP 2: INSPECT RESPONSE & CONFIRM RECORD CREATION           -->
+                    <!-- ============================================================= -->
+                    <div invisible="state != 'fetched'">
+                        <div class="alert alert-success py-2" role="alert">
+                            <strong>✅ REST API Inspector (Step 2: Inspect Response &amp; Return Payload):</strong><br/>
+                            HTTP Request berhasil mendapatkan respon! Periksa status code, latency, raw JSON payload,
+                            dan hasil mapping field Odoo sebelum data disimpan ke database.
+                        </div>
+
+                        <!-- Response Metadata Cards -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-light text-center">
+                                    <small class="text-muted d-block">HTTP Status</small>
+                                    <span class="badge bg-success fs-6"><field name="response_status_text"/></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-light text-center">
+                                    <small class="text-muted d-block">Response Latency</small>
+                                    <strong class="text-primary fs-6"><field name="response_time_ms"/> ms</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2 border rounded bg-light text-center">
+                                    <small class="text-muted d-block">Rating Odoo Mapping</small>
+                                    <strong><field name="parsed_rating_star"/> (<field name="parsed_rating"/>)</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <group string="🎯 Hasil Parsing Data (Mapping ke Model Odoo)">
+                            <group>
+                                <field name="parsed_title"/>
+                                <field name="parsed_premiered"/>
+                                <field name="parsed_runtime"/>
+                            </group>
+                            <group>
+                                <field name="parsed_genres"/>
+                                <field name="parsed_cast"/>
+                                <field name="parsed_image_url"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="📄 HTTP Response Payload (Raw JSON)">
+                                <field name="response_body_raw" nolabel="1" widget="text"
+                                       style="font-family: monospace; font-size: 0.85rem; background-color: #212529; color: #00ff66; padding: 12px; border-radius: 6px; min-height: 220px; white-space: pre;"/>
+                            </page>
+                            <page string="📋 HTTP Response Headers">
+                                <field name="response_headers" nolabel="1" widget="text"
+                                       style="font-family: monospace; font-size: 0.85rem; background-color: #212529; color: #74c0fc; padding: 12px; border-radius: 6px; white-space: pre;"/>
+                            </page>
+                            <page string="📝 Cleaned Synopsis">
+                                <field name="parsed_summary" nolabel="1"/>
+                            </page>
+                            <page string="🌐 Sent Request Recap">
+                                <group>
+                                    <field name="http_method"/>
+                                    <field name="api_endpoint"/>
+                                    <field name="request_params"/>
+                                    <field name="request_headers"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </div>
+                </sheet>
+
+                <footer>
+                    <!-- Buttons for Draft state -->
+                    <button name="action_send_request" string="🚀 Send Request &amp; Inspect Response"
+                            type="object" class="btn-primary" icon="fa-paper-plane" invisible="state != 'draft'"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" invisible="state != 'draft'"/>
+
+                    <!-- Buttons for Fetched state -->
+                    <button name="action_create_movie_record" string="✅ Create Record in Database &amp; Open"
+                            type="object" class="btn-success" icon="fa-check-circle" invisible="state != 'fetched'"/>
+                    <button name="action_reset_draft" string="🔄 Search Again / Back"
+                            type="object" class="btn-secondary" icon="fa-arrow-left" invisible="state != 'fetched'"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" invisible="state != 'fetched'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_movie_fetch_api_wizard" model="ir.actions.act_window">
+        <field name="name">Fetch Movie from REST API</field>
+        <field name="res_model">movie.fetch.api.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- MENU ITEM UNTUK FETCH API DI NAVBAR -->
+    <menuitem id="menu_movie_fetch_api"
+              name="Fetch from API (Demo)"
+              parent="menu_movie_main"
+              action="action_movie_fetch_api_wizard"
+              sequence="30"/>
+</odoo>

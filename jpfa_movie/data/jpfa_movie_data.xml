@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- ===================================================================== -->
+    <!-- MASTER DATA: GENRES -->
+    <!-- ===================================================================== -->
+    <record id="genre_action" model="movie.genre">
+        <field name="name">Action</field>
+        <field name="color">1</field>
+    </record>
+    <record id="genre_scifi" model="movie.genre">
+        <field name="name">Sci-Fi</field>
+        <field name="color">4</field>
+    </record>
+    <record id="genre_drama" model="movie.genre">
+        <field name="name">Drama</field>
+        <field name="color">2</field>
+    </record>
+    <record id="genre_comedy" model="movie.genre">
+        <field name="name">Comedy</field>
+        <field name="color">3</field>
+    </record>
+    <record id="genre_animation" model="movie.genre">
+        <field name="name">Animation</field>
+        <field name="color">5</field>
+    </record>
+    <record id="genre_thriller" model="movie.genre">
+        <field name="name">Thriller</field>
+        <field name="color">6</field>
+    </record>
+    <record id="genre_romance" model="movie.genre">
+        <field name="name">Romance</field>
+        <field name="color">7</field>
+    </record>
+    <record id="genre_horror" model="movie.genre">
+        <field name="name">Horror</field>
+        <field name="color">8</field>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- MASTER DATA: STUDIOS -->
+    <!-- ===================================================================== -->
+    <record id="studio_warner" model="movie.studio">
+        <field name="name">Warner Bros. Pictures</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="studio_universal" model="movie.studio">
+        <field name="name">Universal Pictures</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="studio_ghibli" model="movie.studio">
+        <field name="name">Studio Ghibli</field>
+        <field name="country_id" ref="base.jp"/>
+    </record>
+    <record id="studio_marvel" model="movie.studio">
+        <field name="name">Marvel Studios</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="studio_paramount" model="movie.studio">
+        <field name="name">Paramount Pictures</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="studio_a24" model="movie.studio">
+        <field name="name">A24</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- MASTER DATA: ARTISTS (Actors, Directors, Writers) -->
+    <!-- ===================================================================== -->
+    <record id="artist_nolan" model="movie.artist">
+        <field name="name">Christopher Nolan</field>
+        <field name="role">director</field>
+        <field name="birth_date">1970-07-30</field>
+    </record>
+    <record id="artist_dicaprio" model="movie.artist">
+        <field name="name">Leonardo DiCaprio</field>
+        <field name="role">actor</field>
+        <field name="birth_date">1974-11-11</field>
+    </record>
+    <record id="artist_murphy" model="movie.artist">
+        <field name="name">Cillian Murphy</field>
+        <field name="role">actor</field>
+        <field name="birth_date">1976-05-25</field>
+    </record>
+    <record id="artist_miyazaki" model="movie.artist">
+        <field name="name">Hayao Miyazaki</field>
+        <field name="role">director</field>
+        <field name="birth_date">1941-01-05</field>
+    </record>
+    <record id="artist_rdj" model="movie.artist">
+        <field name="name">Robert Downey Jr.</field>
+        <field name="role">actor</field>
+        <field name="birth_date">1965-04-04</field>
+    </record>
+    <record id="artist_gerwig" model="movie.artist">
+        <field name="name">Greta Gerwig</field>
+        <field name="role">director</field>
+        <field name="birth_date">1983-08-04</field>
+    </record>
+    <record id="artist_robbie" model="movie.artist">
+        <field name="name">Margot Robbie</field>
+        <field name="role">actor</field>
+        <field name="birth_date">1990-07-02</field>
+    </record>
+    <record id="artist_gosling" model="movie.artist">
+        <field name="name">Ryan Gosling</field>
+        <field name="role">actor</field>
+        <field name="birth_date">1980-11-12</field>
+    </record>
+    <record id="artist_zimmer" model="movie.artist">
+        <field name="name">Hans Zimmer</field>
+        <field name="role">writer</field>
+        <field name="birth_date">1957-09-12</field>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- MASTER DATA: MOVIES -->
+    <!-- ===================================================================== -->
+    <record id="movie_inception" model="movie.movie">
+        <field name="name">Inception</field>
+        <field name="release_date">2010-07-16</field>
+        <field name="duration">148</field>
+        <field name="studio_id" ref="studio_warner"/>
+        <field name="rating">5</field>
+        <field name="state">released</field>
+        <field name="poster_image" type="base64" file="jpfa_movie/static/img/inception.png"/>
+        <field name="synopsis">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.</field>
+        <field name="genre_ids" eval="[(4, ref('genre_action')), (4, ref('genre_scifi')), (4, ref('genre_thriller'))]"/>
+        <field name="artist_ids" eval="[(4, ref('artist_nolan')), (4, ref('artist_dicaprio')), (4, ref('artist_zimmer'))]"/>
+    </record>
+
+    <record id="movie_oppenheimer" model="movie.movie">
+        <field name="name">Oppenheimer</field>
+        <field name="release_date">2023-07-21</field>
+        <field name="duration">180</field>
+        <field name="studio_id" ref="studio_universal"/>
+        <field name="rating">5</field>
+        <field name="state">released</field>
+        <field name="poster_image" type="base64" file="jpfa_movie/static/img/oppenheimer.png"/>
+        <field name="synopsis">The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.</field>
+        <field name="genre_ids" eval="[(4, ref('genre_drama')), (4, ref('genre_thriller'))]"/>
+        <field name="artist_ids" eval="[(4, ref('artist_nolan')), (4, ref('artist_murphy')), (4, ref('artist_rdj'))]"/>
+    </record>
+
+    <record id="movie_spirited_away" model="movie.movie">
+        <field name="name">Spirited Away</field>
+        <field name="release_date">2001-07-20</field>
+        <field name="duration">125</field>
+        <field name="studio_id" ref="studio_ghibli"/>
+        <field name="rating">5</field>
+        <field name="state">released</field>
+        <field name="poster_image" type="base64" file="jpfa_movie/static/img/spirited_away.png"/>
+        <field name="synopsis">During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts.</field>
+        <field name="genre_ids" eval="[(4, ref('genre_animation')), (4, ref('genre_drama'))]"/>
+        <field name="artist_ids" eval="[(4, ref('artist_miyazaki'))]"/>
+    </record>
+
+    <record id="movie_barbie" model="movie.movie">
+        <field name="name">Barbie</field>
+        <field name="release_date">2023-07-21</field>
+        <field name="duration">114</field>
+        <field name="studio_id" ref="studio_warner"/>
+        <field name="rating">4</field>
+        <field name="state">released</field>
+        <field name="poster_image" type="base64" file="jpfa_movie/static/img/barbie.png"/>
+        <field name="synopsis">Barbie suffers a crisis that leads her to question her world and her existence in Barbie Land.</field>
+        <field name="genre_ids" eval="[(4, ref('genre_comedy')), (4, ref('genre_romance'))]"/>
+        <field name="artist_ids" eval="[(4, ref('artist_gerwig')), (4, ref('artist_robbie')), (4, ref('artist_gosling'))]"/>
+    </record>
+
+    <record id="movie_upcoming_scifi" model="movie.movie">
+        <field name="name">Project Interstellar Odyssey</field>
+        <field name="release_date">2027-11-15</field>
+        <field name="duration">150</field>
+        <field name="studio_id" ref="studio_paramount"/>
+        <field name="rating">0</field>
+        <field name="state">draft</field>
+        <field name="synopsis">An exploratory sci-fi mission deep beyond known galaxies into deep interstellar space.</field>
+        <field name="genre_ids" eval="[(4, ref('genre_scifi'))]"/>
+        <field name="artist_ids" eval="[(4, ref('artist_nolan'))]"/>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- MASTER DATA: REVIEWS -->
+    <!-- ===================================================================== -->
+    <record id="review_inception_1" model="movie.review">
+        <field name="movie_id" ref="movie_inception"/>
+        <field name="reviewer_id" ref="base.user_admin"/>
+        <field name="score">10</field>
+        <field name="comment">Mind-blowing storytelling and exceptional visual effects. A modern classic!</field>
+    </record>
+
+    <record id="review_oppenheimer_1" model="movie.review">
+        <field name="movie_id" ref="movie_oppenheimer"/>
+        <field name="reviewer_id" ref="base.user_admin"/>
+        <field name="score">9</field>
+        <field name="comment">Masterful direction, gripping tension, and unforgettable acting performance by Cillian Murphy.</field>
+    </record>
+
+    <record id="review_spirited_1" model="movie.review">
+        <field name="movie_id" ref="movie_spirited_away"/>
+        <field name="reviewer_id" ref="base.user_admin"/>
+        <field name="score">10</field>
+        <field name="comment">A breathtaking anime masterpiece by Studio Ghibli. Beautiful in every single frame.</field>
+    </record>
+</odoo>

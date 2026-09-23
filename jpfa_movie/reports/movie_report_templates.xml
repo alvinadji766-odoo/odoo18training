@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================================================================== -->
+    <!-- 1. ACTION REPORT DEFINITION (ir.actions.report)                       -->
+    <!-- Mendaftarkan action print PDF di menu 'Print' model movie.movie       -->
+    <!-- ===================================================================== -->
+    <record id="action_report_movie_detail" model="ir.actions.report">
+        <field name="name">Movie Catalog Sheet (PDF)</field>
+        <field name="model">movie.movie</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">jpfa_movie.report_movie_detail</field>
+        <field name="report_file">jpfa_movie.report_movie_detail</field>
+        <field name="print_report_name">'Movie Catalog - %s' % (object.name.replace('/', '_'))</field>
+        <field name="binding_model_id" ref="model_movie_movie"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- 2. MAIN REPORT WRAPPER TEMPLATE (Looping docs)                        -->
+    <!-- ===================================================================== -->
+    <template id="report_movie_detail">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="jpfa_movie.report_movie_detail_document" t-lang="doc.env.user.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- ===================================================================== -->
+    <!-- 3. DETAILED DOCUMENT TEMPLATE (Layout per record)                     -->
+    <!-- ===================================================================== -->
+    <template id="report_movie_detail_document">
+        <t t-call="web.external_layout">
+            <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #2c3e50;">
+                
+                <!-- HEADER SECTION: Title & State Badge -->
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                    <div>
+                        <h2 class="m-0 text-primary" style="font-weight: 700;">
+                            <span t-field="doc.name"/>
+                        </h2>
+                        <small class="text-muted">
+                            <i class="fa fa-film me-1"/> Odoo 18 Movie Catalog Training Sheet
+                        </small>
+                    </div>
+                    <div>
+                        <!-- Status Badge -->
+                        <t t-if="doc.state == 'draft'">
+                            <span class="badge rounded-pill bg-secondary p-2 fs-6">Draft</span>
+                        </t>
+                        <t t-elif="doc.state == 'in_production'">
+                            <span class="badge rounded-pill bg-warning text-dark p-2 fs-6">In Production</span>
+                        </t>
+                        <t t-elif="doc.state == 'released'">
+                            <span class="badge rounded-pill bg-success p-2 fs-6">Released</span>
+                        </t>
+                        <t t-elif="doc.state == 'archived'">
+                            <span class="badge rounded-pill bg-danger p-2 fs-6">Archived</span>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- TOP GRID: Poster & Movie Metadata -->
+                <div class="row mb-4">
+                    <!-- Column 1: Poster Image -->
+                    <div class="col-4 text-center">
+                        <t t-if="doc.poster_image">
+                            <img t-att-src="image_data_uri(doc.poster_image)" 
+                                 class="img-fluid rounded border shadow-sm"
+                                 style="max-height: 260px; width: 100%; object-fit: cover;"/>
+                        </t>
+                        <t t-else="">
+                            <div class="border rounded bg-light d-flex align-items-center justify-content-center"
+                                 style="height: 220px; color: #adb5bd;">
+                                <div>
+                                    <i class="fa fa-picture-o fa-3x d-block mb-2"/>
+                                    <span>No Poster Image</span>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Column 2: Key Metadata -->
+                    <div class="col-8">
+                        <table class="table table-sm table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 35%;"><strong><i class="fa fa-building-o text-muted me-1"/> Studio:</strong></td>
+                                    <td>
+                                        <span t-if="doc.studio_id" t-field="doc.studio_id.name" class="fw-bold text-dark"/>
+                                        <span t-else="" class="text-muted fst-italic">Not Specified</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong><i class="fa fa-calendar text-muted me-1"/> Release Date:</strong></td>
+                                    <td>
+                                        <span t-if="doc.release_date" t-field="doc.release_date"/>
+                                        <span t-else="" class="text-muted fst-italic">Unreleased / TBA</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong><i class="fa fa-clock-o text-muted me-1"/> Duration:</strong></td>
+                                    <td>
+                                        <span t-field="doc.duration"/> Minutes
+                                        <t t-if="doc.duration &gt; 0">
+                                            <small class="text-muted">
+                                                (<t t-out="doc.duration // 60"/>h <t t-out="doc.duration % 60"/>m)
+                                            </small>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong><i class="fa fa-star text-warning me-1"/> Rating:</strong></td>
+                                    <td>
+                                        <t t-if="doc.rating == '5'">⭐⭐⭐⭐⭐ (5/5 Exceptional)</t>
+                                        <t t-elif="doc.rating == '4'">⭐⭐⭐⭐ (4/5 Great)</t>
+                                        <t t-elif="doc.rating == '3'">⭐⭐⭐ (3/5 Good)</t>
+                                        <t t-elif="doc.rating == '2'">⭐⭐ (2/5 Fair)</t>
+                                        <t t-elif="doc.rating == '1'">⭐ (1/5 Poor)</t>
+                                        <t t-else="">⚪ Not Rated</t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong><i class="fa fa-tags text-muted me-1"/> Genres:</strong></td>
+                                    <td>
+                                        <t t-if="doc.genre_ids">
+                                            <t t-foreach="doc.genre_ids" t-as="genre">
+                                                <span class="badge bg-primary me-1 mb-1" style="font-size: 0.8rem;">
+                                                    <t t-esc="genre.name"/>
+                                                </span>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="text-muted fst-italic">No Genres Assigned</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SYNOPSIS SECTION -->
+                <div class="mb-4">
+                    <h5 class="border-bottom pb-1 text-secondary" style="font-weight: 600;">
+                        <i class="fa fa-align-left me-1"/> Synopsis
+                    </h5>
+                    <div class="p-3 bg-light rounded border">
+                        <t t-if="doc.synopsis">
+                            <p class="m-0 text-justify" style="line-height: 1.6; font-size: 0.95rem;">
+                                <span t-field="doc.synopsis"/>
+                            </p>
+                        </t>
+                        <t t-else="">
+                            <p class="m-0 text-muted fst-italic">Belum ada sinopsis untuk film ini.</p>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- CAST & CREW SECTION -->
+                <div class="mb-4" style="page-break-inside: avoid;">
+                    <h5 class="border-bottom pb-1 text-secondary" style="font-weight: 600;">
+                        <i class="fa fa-users me-1"/> Cast &amp; Crew (Artis Terkait)
+                    </h5>
+                    <table class="table table-sm table-striped table-bordered mt-2" style="border-color: #dee2e6;">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 5%;" class="text-center">#</th>
+                                <th style="width: 45%;">Artist / Crew Name</th>
+                                <th style="width: 25%;">Birth Date</th>
+                                <th style="width: 25%;">Primary Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="doc.artist_ids">
+                                <t t-set="idx" t-value="1"/>
+                                <t t-foreach="doc.artist_ids" t-as="artist">
+                                    <tr>
+                                        <td class="text-center"><t t-out="idx"/></td>
+                                        <td><strong><span t-field="artist.name"/></strong></td>
+                                        <td>
+                                            <span t-if="artist.birth_date" t-field="artist.birth_date"/>
+                                            <span t-else="" class="text-muted">-</span>
+                                        </td>
+                                        <td>
+                                            <t t-if="artist.role == 'actor'"><span class="badge bg-info text-dark">🎭 Actor</span></t>
+                                            <t t-elif="artist.role == 'director'"><span class="badge bg-danger">🎬 Director</span></t>
+                                            <t t-elif="artist.role == 'producer'"><span class="badge bg-warning text-dark">💼 Producer</span></t>
+                                            <t t-elif="artist.role == 'writer'"><span class="badge bg-secondary">✍️ Writer</span></t>
+                                            <t t-else=""><span t-field="artist.role"/></t>
+                                        </td>
+                                    </tr>
+                                    <t t-set="idx" t-value="idx + 1"/>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted fst-italic py-2">
+                                        Belum ada data cast &amp; crew terhubung.
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- REPORT FOOTNOTE -->
+                <div class="row mt-4 pt-2 border-top text-muted" style="font-size: 0.8rem;">
+                    <div class="col-6">
+                        <span>Printed on: <t t-out="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')"/></span>
+                    </div>
+                    <div class="col-6 text-end">
+                        <span>Printed by: <t t-out="user.name"/></span>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+</odoo>
+

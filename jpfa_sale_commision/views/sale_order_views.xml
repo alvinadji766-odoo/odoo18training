@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form -->
+    <record id="view_order_form_commission" model="ir.ui.view">
+        <field name="name">sale.order.form.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <group name="commision" string="Commision">
+                    <field name="commision_percent" invisible="0"/>
+                    <field name="commision_nominal"/>
+                    <button name="action_cancel" type="object" string="Cancel"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Commision">
+                </page>
+            </xpath>
+
+            <!-- Tambah button -->
+            <xpath expr="//header" position="inside">
+
+                <!-- button object -->
+                <button name="calculate_nominal" 
+                    string="Calculate Nominal" 
+                    type="object"
+                    invisible="1"/>
+                <!-- button action -->
+                <button name="%(action_orders_custom)d" 
+                    string="Test Button Action" 
+                    type="action"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="view_order_list_commission" model="ir.ui.view">
+        <field name="name">sale.order.list.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="commision_percent"/>
+                <field name="commision_nominal"/>
+            </xpath>            
+        </field>
+    </record>
+
+    <!-- Kanban -->
+    <record id="view_sale_order_kanban" model="ir.ui.view">
+        <field name="name">view_sale_order_kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="commision_percent"/>
+                <field name="commision_nominal"/>
+            </xpath>            
+        </field>
+    </record>
+
+
+    <!-- Search View -->
+    <record id="view_sales_order_filter" model="ir.ui.view">
+        <field name="name">view_sales_order_filter</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <filter string="Has Commision" domain="[('commision_percent', '!=', 0)]" name="commision_filter"/>
+            </xpath>            
+        </field>
+    </record>
+
+    <!-- Custom Action -->
+    <record id="action_orders_custom" model="ir.actions.act_window">
+        <field name="name">Sales Orders Custom</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="sale.view_sales_order_filter"/>
+        <field name="context">{'search_default_commision_filter' : 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new quotation, the first step of a new sale!
+            </p><p>
+                Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+            </p>
+        </field>
+    </record>
+
+    <!-- Custom Menu -->
+    <menuitem id="menu_sale_custom"
+        name="Sale Custom"
+        parent="sale.sale_order_menu"
+        action="action_orders_custom" sequence="10"
+        groups="sales_team.group_sale_manager"/>
+
+</odoo>

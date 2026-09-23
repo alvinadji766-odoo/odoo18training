@@ -1,0 +1,21 @@
+{
+    'name': 'Movie Catalog',
+    'version': '18.0.1.0.0',
+    'category': 'Training',
+    'summary': 'Contoh modul katalog film',
+    'depends': ['base', 'mail'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/jpfa_movie_data.xml',
+        'views/movie_movie_views.xml',
+        'views/movie_config_views.xml',
+        'views/movie_review_views.xml',
+        'views/menu.xml',
+        'reports/movie_report_templates.xml',
+        'wizards/movie_fetch_api_wizard_views.xml',
+    ],
+    'license': 'LGPL-3',
+    'application': True,
+    'installable': True,
+}

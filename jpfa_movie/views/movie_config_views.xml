@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================================================================== -->
+    <!-- GENRE -->
+    <!-- ===================================================================== -->
+    <record id="view_movie_genre_list" model="ir.ui.view">
+        <field name="name">movie.genre.list</field>
+        <field name="model">movie.genre</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="movie_count" string="Movies"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_movie_genre_form" model="ir.ui.view">
+        <field name="name">movie.genre.form</field>
+        <field name="model">movie.genre</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_movies" type="object" class="oe_stat_button" icon="fa-film">
+                            <field name="movie_count" widget="statinfo" string="Movies"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" widget="color_picker"/>
+                    </group>
+                    <notebook>
+                        <page string="Movies with this Genre">
+                            <field name="movie_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="release_date"/>
+                                    <field name="avg_rating"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_movie_genre_search" model="ir.ui.view">
+        <field name="name">movie.genre.search</field>
+        <field name="model">movie.genre</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_movie_genre" model="ir.actions.act_window">
+        <field name="name">Genres</field>
+        <field name="res_model">movie.genre</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_movie_genre_search"/>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- ARTIST -->
+    <!-- ===================================================================== -->
+    <record id="view_movie_artist_list" model="ir.ui.view">
+        <field name="name">movie.artist.list</field>
+        <field name="model">movie.artist</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="role" widget="badge"
+                       decoration-info="role == 'actor'"
+                       decoration-warning="role == 'director'"
+                       decoration-success="role == 'writer'"/>
+                <field name="birth_date"/>
+                <field name="movie_count" string="Movies"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_movie_artist_form" model="ir.ui.view">
+        <field name="name">movie.artist.form</field>
+        <field name="model">movie.artist</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_movies" type="object" class="oe_stat_button" icon="fa-film">
+                            <field name="movie_count" widget="statinfo" string="Movies"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="role"/>
+                        </group>
+                        <group>
+                            <field name="birth_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Filmography">
+                            <field name="movie_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="release_date"/>
+                                    <field name="studio_id"/>
+                                    <field name="avg_rating"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_movie_artist_search" model="ir.ui.view">
+        <field name="name">movie.artist.search</field>
+        <field name="model">movie.artist</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="filter_actor" string="Actors" domain="[('role', '=', 'actor')]"/>
+                <filter name="filter_director" string="Directors" domain="[('role', '=', 'director')]"/>
+                <filter name="filter_writer" string="Writers" domain="[('role', '=', 'writer')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_role" string="Role" context="{'group_by': 'role'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_movie_artist" model="ir.actions.act_window">
+        <field name="name">Artists</field>
+        <field name="res_model">movie.artist</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_movie_artist_search"/>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- STUDIO -->
+    <!-- ===================================================================== -->
+    <record id="view_movie_studio_list" model="ir.ui.view">
+        <field name="name">movie.studio.list</field>
+        <field name="model">movie.studio</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="country_id"/>
+                <field name="movie_count" string="Movies Produced"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_movie_studio_form" model="ir.ui.view">
+        <field name="name">movie.studio.form</field>
+        <field name="model">movie.studio</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_movies" type="object" class="oe_stat_button" icon="fa-film">
+                            <field name="movie_count" widget="statinfo" string="Movies"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="country_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Movies Produced">
+                            <field name="movie_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="release_date"/>
+                                    <field name="avg_rating"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_movie_studio_search" model="ir.ui.view">
+        <field name="name">movie.studio.search</field>
+        <field name="model">movie.studio</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="country_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_country" string="Country" context="{'group_by': 'country_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_movie_studio" model="ir.actions.act_window">
+        <field name="name">Studios</field>
+        <field name="res_model">movie.studio</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_movie_studio_search"/>
+    </record>
+</odoo>

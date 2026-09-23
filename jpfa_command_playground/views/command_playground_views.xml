@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- FORM VIEW -->
+    <record id="view_command_playground_form" model="ir.ui.view">
+        <field name="name">command.playground.form</field>
+        <field name="model">command.playground</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <!-- Custom Values Wizard Runner -->
+                    <button name="action_open_custom_wizard" string="⚙️ Custom Values Wizard" type="object"
+                            class="btn-success fw-bold" icon="fa-sliders"
+                            help="Buka Wizard untuk mencoba Command dengan values yang Anda tentukan sendiri!"/>
+
+                    <!-- One2many Buttons -->
+                    <button name="action_cmd_0_create" string="0: Create Line (O2M)" type="object"
+                            class="btn-primary" icon="fa-plus-circle"
+                            help="Command 0: Membuat baris baru di One2many"/>
+                    <button name="action_cmd_1_update" string="1: Update Line (O2M)" type="object"
+                            class="btn-secondary" icon="fa-pencil"
+                            help="Command 1: Mengupdate baris pertama di One2many"/>
+                    <button name="action_cmd_2_delete" string="2: Delete Line (O2M)" type="object"
+                            class="btn-outline-danger" icon="fa-trash"
+                            help="Command 2: Hard delete baris terakhir dari DB"/>
+
+                    <!-- Many2many Buttons -->
+                    <button name="action_cmd_0_create_tag" string="0: Create Tag (M2M)" type="object"
+                            class="btn-outline-primary" icon="fa-tag"
+                            help="Command 0: Membuat Tag baru langsung ke Many2many"/>
+                    <button name="action_cmd_4_link" string="4: Link Tag (M2M)" type="object"
+                            class="btn-info" icon="fa-link"
+                            help="Command 4: Menyambungkan tag yang sudah ada"/>
+                    <button name="action_cmd_3_unlink" string="3: Unlink Tag (M2M)" type="object"
+                            class="btn-warning" icon="fa-chain-broken"
+                            help="Command 3: Melepas link tag (tanpa menghapus tag dari DB)"/>
+                    <button name="action_cmd_6_set" string="6: Set Tags (M2M)" type="object"
+                            class="btn-secondary" icon="fa-refresh"
+                            help="Command 6: Replace all isi tag dengan list ID baru"/>
+                    <button name="action_cmd_5_clear" string="5: Clear Tags (M2M)" type="object"
+                            class="btn-outline-secondary" icon="fa-eraser"
+                            help="Command 5: Mengosongkan seluruh relasi tag"/>
+
+                    <button name="action_reset_playground" string="🔄 Reset Session" type="object"
+                            class="btn-outline-dark"
+                            help="Kembalikan session ke data sampel awal"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lines" type="object" class="oe_stat_button" icon="fa-list-ol">
+                            <field name="line_count" widget="statinfo" string="Lines (O2M)"/>
+                        </button>
+                        <button name="action_view_tags" type="object" class="oe_stat_button" icon="fa-tags">
+                            <field name="tag_count" widget="statinfo" string="Tags (M2M)"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Session name"/></h1>
+                    </div>
+
+                    <div class="alert alert-info py-2 my-3" role="status">
+                        <strong>Last Executed: </strong>
+                        <field name="last_command" readonly="1" class="fw-bold"/>
+                    </div>
+
+                    <notebook>
+                        <!-- TAB 1: INTERACTIVE DATA -->
+                        <page string="🎯 Live Relational Target" name="live_target">
+                            <div class="row">
+                                <!-- MANY2MANY AREA -->
+                                <div class="col-12 mb-3 p-3 border rounded bg-light">
+                                    <h5 class="text-primary fw-bold mb-2">🏷️ Many2many Target: Tags (Relational)</h5>
+                                    <p class="text-muted small mb-2">
+                                        Perhatikan badge tag di bawah ini dan tabel detail tag terkait saat Anda menjalankan Command 0, 3, 4, 5, atau 6.
+                                    </p>
+                                    <div class="mb-3">
+                                        <field name="tag_ids" widget="many2many_tags"
+                                               options="{'color_field': 'color', 'no_create_edit': True}"/>
+                                    </div>
+                                    <field name="tag_ids" nolabel="1">
+                                        <list>
+                                            <field name="id" string="Record ID"/>
+                                            <field name="name" string="Tag Name"/>
+                                            <field name="color" widget="color_picker"/>
+                                        </list>
+                                    </field>
+                                </div>
+
+                                <!-- ONE2MANY AREA -->
+                                <div class="col-12 p-3 border rounded bg-light">
+                                    <h5 class="text-success fw-bold mb-2">📦 One2many Target: Item Lines</h5>
+                                    <p class="text-muted small mb-2">
+                                        Tabel baris child One2many. Dicoba dengan Command 0 (Create), Command 1 (Update), dan Command 2 (Delete).
+                                    </p>
+                                    <field name="line_ids" nolabel="1">
+                                        <list editable="bottom">
+                                            <field name="id" string="ID" readonly="1"/>
+                                            <field name="name"/>
+                                            <field name="quantity"/>
+                                            <field name="price"/>
+                                            <field name="subtotal"/>
+                                        </list>
+                                    </field>
+                                </div>
+                            </div>
+                        </page>
+
+                        <!-- TAB 2: CODE SNIPPET & EXECUTION LOG -->
+                        <page string="💻 Code Snippet &amp; Live Log" name="logs">
+                            <group string="Python Code Executed">
+                                <field name="code_snippet" nolabel="1" widget="text"
+                                       style="font-family: monospace; background-color: #f8f9fa;"/>
+                            </group>
+                            <group string="Execution Log &amp; Explanation">
+                                <field name="execution_log" nolabel="1" widget="text"
+                                       style="font-family: monospace; color: #0d6efd;"/>
+                            </group>
+                        </page>
+
+                        <!-- TAB 3: CHEAT SHEET -->
+                        <page string="📖 Command Cheat Sheet" name="cheatsheet">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped mt-2">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Tuple Syntax</th>
+                                            <th>Modern Syntax (Odoo 15+)</th>
+                                            <th>Target</th>
+                                            <th>Penjelasan &amp; Efek Database</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge bg-primary">0</span></td>
+                                            <td><code>(0, 0, vals)</code></td>
+                                            <td><code>Command.create(vals)</code></td>
+                                            <td>O2M, M2M</td>
+                                            <td>Membuat record child baru di database &amp; langsung me-link ke parent.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-secondary">1</span></td>
+                                            <td><code>(1, id, vals)</code></td>
+                                            <td><code>Command.update(id, vals)</code></td>
+                                            <td>O2M, M2M</td>
+                                            <td>Mengupdate nilai field pada record child yang sudah ada (butuh record ID).</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-danger">2</span></td>
+                                            <td><code>(2, id, 0)</code></td>
+                                            <td><code>Command.delete(id)</code></td>
+                                            <td>O2M, M2M</td>
+                                            <td><strong>HARD DELETE</strong>: Menghapus record child dari database sekaligus memutus relasi.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-warning text-dark">3</span></td>
+                                            <td><code>(3, id, 0)</code></td>
+                                            <td><code>Command.unlink(id)</code></td>
+                                            <td>M2M, O2M (nullable)</td>
+                                            <td><strong>UNLINK ONLY</strong>: Memutus relasi saja. Record target <u>TIDAK</u> dihapus dari DB.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-info text-dark">4</span></td>
+                                            <td><code>(4, id, 0)</code></td>
+                                            <td><code>Command.link(id)</code></td>
+                                            <td>M2M</td>
+                                            <td>Menghubungkan record master yang sudah ada di DB tanpa membuat baru.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-dark">5</span></td>
+                                            <td><code>(5, 0, 0)</code></td>
+                                            <td><code>Command.clear()</code></td>
+                                            <td>M2M, O2M</td>
+                                            <td>Mengosongkan seluruh isi relasi (Unlink all).</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-success">6</span></td>
+                                            <td><code>(6, 0, ids)</code></td>
+                                            <td><code>Command.set(ids)</code></td>
+                                            <td>M2M</td>
+                                            <td><strong>REPLACE ALL</strong>: Mengganti seluruh isi relasi dengan list ID baru yang diberikan.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- LIST VIEW -->
+    <record id="view_command_playground_list" model="ir.ui.view">
+        <field name="name">command.playground.list</field>
+        <field name="model">command.playground</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="last_command"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="line_count" string="Lines"/>
+                <field name="tag_count" string="Tags"/>
+                <field name="write_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ACTION: PLAYGROUND SESSIONS -->
+    <record id="action_command_playground" model="ir.actions.act_window">
+        <field name="name">Playground Sessions</field>
+        <field name="res_model">command.playground</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Buat session playground ORM pertama Anda!</p>
+        </field>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- MASTER DATA: TAGS VIEWS & ACTION -->
+    <!-- ===================================================================== -->
+    <record id="view_command_playground_tag_list" model="ir.ui.view">
+        <field name="name">command.playground.tag.list</field>
+        <field name="model">command.playground.tag</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="id" string="Record ID" readonly="1"/>
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="playground_count" string="Used in Sessions"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_command_playground_tag_form" model="ir.ui.view">
+        <field name="name">command.playground.tag.form</field>
+        <field name="model">command.playground.tag</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_playgrounds" type="object" class="oe_stat_button" icon="fa-flask">
+                            <field name="playground_count" widget="statinfo" string="Sessions"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Tag name..."/></h1>
+                    </div>
+                    <group>
+                        <field name="color" widget="color_picker"/>
+                    </group>
+                    <notebook>
+                        <page string="Playground Sessions Using This Tag">
+                            <field name="playground_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="last_command"/>
+                                    <field name="write_date"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_command_playground_tag_search" model="ir.ui.view">
+        <field name="name">command.playground.tag.search</field>
+        <field name="model">command.playground.tag</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_command_playground_tag" model="ir.actions.act_window">
+        <field name="name">Master Data Tags</field>
+        <field name="res_model">command.playground.tag</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_command_playground_tag_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Buat master data Tag pertama Anda!</p>
+        </field>
+    </record>
+
+    <!-- ===================================================================== -->
+    <!-- MENUS -->
+    <!-- ===================================================================== -->
+    <menuitem id="menu_command_playground_root"
+              name="Command Playground"
+              sequence="45"
+              web_icon="jpfa_command_playground,static/description/icon.png"/>
+
+    <menuitem id="menu_command_playground_session"
+              name="Playground Sessions"
+              parent="menu_command_playground_root"
+              sequence="10"
+              action="action_command_playground"/>
+
+    <menuitem id="menu_command_playground_tag"
+              name="Master Data Tags (M2M)"
+              parent="menu_command_playground_root"
+              sequence="20"
+              action="action_command_playground_tag"/>
+
+</odoo>

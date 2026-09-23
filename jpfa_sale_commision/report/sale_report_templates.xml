@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================================================================== -->
+    <!-- INHERIT QWEB REPORT SALE ORDER (sale.report_saleorder_document)       -->
+    <!-- Menambahkan informasi persentase & nominal komisi sales               -->
+    <!-- ===================================================================== -->
+    <template id="report_saleorder_document_inherit_commission" inherit_id="sale.report_saleorder_document">
+        
+        <!-- 1. Tambah Informasi Komisi di Blok Header Informasi Order -->
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div t-if="doc.commision_percent" class="col-auto col-3 mw-100 mb-2" name="commision_info">
+                <strong>Sales Commission:</strong>
+                <p class="m-0">
+                    <span t-field="doc.commision_percent"/>%
+                </p>
+            </div>
+        </xpath>
+
+        <!-- 2. Tambah Rincian Komisi di Bawah Total Ringkasan Penjualan -->
+        <xpath expr="//div[@name='so_total_summary']" position="after">
+            <div t-if="doc.commision_nominal" class="row justify-content-end mt-2">
+                <div class="col-6">
+                    <table class="table table-sm table-bordered" style="page-break-inside: avoid; border-color: #dee2e6;">
+                        <tr class="table-light">
+                            <td colspan="2" class="text-center font-weight-bold" style="background-color: #f8f9fa;">
+                                <strong>💼 Japfa Commission Summary</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Commission Rate:</strong></td>
+                            <td class="text-end"><span t-field="doc.commision_percent"/>%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Commission Nominal:</strong></td>
+                            <td class="text-end">
+                                <strong><span t-field="doc.commision_nominal"/></strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+</odoo>
+

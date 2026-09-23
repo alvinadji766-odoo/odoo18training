@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- LIST -->
+    <record id="view_movie_movie_list" model="ir.ui.view">
+        <field name="name">movie.movie.list</field>
+        <field name="model">movie.movie</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'draft'">
+                <field name="poster_image" widget="image" options="{'size': [32, 32]}" optional="show"/>
+                <field name="name"/>
+                <field name="rating" widget="priority" optional="show"/>
+                <field name="release_date"/>
+                <field name="studio_id"/>
+                <field name="genre_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="duration"/>
+                <field name="avg_rating"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'released'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_movie_movie_form" model="ir.ui.view">
+        <field name="name">movie.movie.form</field>
+        <field name="model">movie.movie</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_release" string="Release" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_back_draft" string="Back to Draft" type="object"
+                            invisible="state != 'released'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,released"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_reviews" type="object" class="oe_stat_button" icon="fa-star">
+                            <field name="review_count" widget="statinfo" string="Reviews"/>
+                        </button>
+                        <button name="action_view_artists" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="artist_count" widget="statinfo" string="Cast &amp; Crew"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    
+                    <!-- Poster Image (Binary Widget) -->
+                    <field name="poster_image" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'poster_image'}"/>
+
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Movie title"/></h1>
+                        <div class="o_row">
+                            <!-- Star Rating (Selection + Widget Priority) -->
+                            <field name="rating" widget="priority"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Movie Information">
+                            <field name="release_date"/>
+                            <field name="duration"/>
+                            <field name="studio_id"/>
+                        </group>
+                        <group string="Classification &amp; Stats">
+                            <field name="genre_ids" widget="many2many_tags"
+                                   options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <field name="avg_rating"/>
+                            <field name="review_count"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Cast &amp; Crew" name="cast">
+                            <field name="artist_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="role"/>
+                                    <field name="birth_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Reviews" name="reviews">
+                            <field name="review_ids">
+                                <list editable="bottom">
+                                    <field name="reviewer_id"/>
+                                    <field name="score"/>
+                                    <field name="comment"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Synopsis" name="synopsis">
+                            <field name="synopsis"/>
+                        </page>
+                        <page string="Files &amp; Attachment (Binary Demo)" name="attachments">
+                            <group>
+                                <field name="attachment_filename" invisible="1"/>
+                                <field name="attachment_file" filename="attachment_filename"
+                                       widget="binary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH -->
+    <record id="view_movie_movie_search" model="ir.ui.view">
+        <field name="name">movie.movie.search</field>
+        <field name="model">movie.movie</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="studio_id"/>
+                <field name="genre_ids"/>
+                <field name="artist_ids"/>
+                <field name="rating"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_released" string="Released" domain="[('state', '=', 'released')]"/>
+                <separator/>
+                <filter name="filter_high_rating" string="High Rating (>= 4 Stars)" domain="[('rating', 'in', ['4', '5'])]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_rating" string="Rating" context="{'group_by': 'rating'}"/>
+                    <filter name="group_studio" string="Studio" context="{'group_by': 'studio_id'}"/>
+                    <filter name="group_year" string="Release Year"
+                            context="{'group_by': 'release_date:year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- KANBAN -->
+    <record id="view_movie_movie_kanban" model="ir.ui.view">
+        <field name="name">movie.movie.kanban</field>
+        <field name="model">movie.movie</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="color"/>
+                <field name="release_date"/>
+                <field name="poster_image"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click d-flex flex-row gap-2">
+                            <div class="o_kanban_image" t-if="record.poster_image.raw_value">
+                                <field name="poster_image" widget="image" class="o_image_64_cover"/>
+                            </div>
+                            <div class="oe_kanban_details d-flex flex-column flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong><field name="name"/></strong>
+                                    <field name="rating" widget="priority"/>
+                                </div>
+                                <div class="text-muted">
+                                    <field name="studio_id"/>
+                                    <span t-if="record.release_date.raw_value"> · <field name="release_date"/></span>
+                                </div>
+                                <div>
+                                    <field name="genre_ids" widget="many2many_tags"
+                                           options="{'color_field': 'color'}"/>
+                                </div>
+                                <div class="text-muted small">
+                                    ★ Avg: <field name="avg_rating"/> (<field name="review_count"/> reviews)
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_movie_movie" model="ir.actions.act_window">
+        <field name="name">Movies</field>
+        <field name="res_model">movie.movie</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first movie</p>
+        </field>
+    </record>
+</odoo>
