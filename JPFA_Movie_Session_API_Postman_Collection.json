@@ -1,0 +1,347 @@
+{
+  "info": {
+    "_postman_id": "b7e2c140-5f3a-4a29-b681-9b16e88d01f4",
+    "name": "JPFA Movie - Odoo 18 Session API",
+    "description": "Koleksi Postman untuk menguji REST API JPFA Movie menggunakan autentikasi bawaan Odoo (Session-Based / request.session.authenticate). Mendukung login, session cookie, dan CRUD movie dengan hak akses user.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8018",
+      "type": "string"
+    },
+    {
+      "key": "odoo_db",
+      "value": "odoo18training",
+      "type": "string"
+    },
+    {
+      "key": "odoo_user",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "odoo_password",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "movie_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication (Session)",
+      "description": "Endpoint autentikasi session Odoo",
+      "item": [
+        {
+          "name": "1.1 Login (Dapatkan Session Cookie)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.status === 'success' && jsonData.data) {",
+                  "    pm.collectionVariables.set('session_id', jsonData.data.session_id);",
+                  "    console.log('Session ID tersimpan:', jsonData.data.session_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"db\": \"{{odoo_db}}\",\n  \"login\": \"{{odoo_user}}\",\n  \"password\": \"{{odoo_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login ke Odoo menggunakan database, username, dan password. Postman akan otomatis menyimpan cookie 'session_id'."
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Mengecek informasi profil user Odoo yang sedang login via session."
+          },
+          "response": []
+        },
+        {
+          "name": "1.3 Logout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Mengakhiri session aktif di server Odoo."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Movies (Protected by Session)",
+      "description": "Endpoint CRUD film yang dilindungi autentikasi session Odoo",
+      "item": [
+        {
+          "name": "2.1 Get Movie List (Filter & Pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/movies?limit=10&offset=0&state=released",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movies"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Jumlah record per halaman"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Offset pagination"
+                },
+                {
+                  "key": "state",
+                  "value": "released",
+                  "description": "Filter status: draft / released"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Cari berdasarkan nama film"
+                }
+              ]
+            },
+            "description": "Mengambil daftar film dengan hak akses user yang sedang login."
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 Get Movie Detail by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/movies/{{movie_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movies",
+                "{{movie_id}}"
+              ]
+            },
+            "description": "Mengambil informasi detail film beserta artis (cast) dan ulasan (reviews)."
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 Create Movie (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.status === 'success' && jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set('movie_id', jsonData.data.id);",
+                  "    console.log('Movie ID baru tersimpan:', jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dune: Part Two (Session API Test)\",\n  \"duration\": 166,\n  \"release_date\": \"2026-11-20\",\n  \"rating\": \"5\",\n  \"synopsis\": \"Film epik fiksi ilmiah yang dibuat melalui Postman Session API Odoo 18.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/movies",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movies"
+              ]
+            },
+            "description": "Membuat record film baru dengan identitas user yang login."
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 Update Movie (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dune: Part Two (Updated)\",\n  \"duration\": 170,\n  \"state\": \"released\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/movies/{{movie_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movies",
+                "{{movie_id}}"
+              ]
+            },
+            "description": "Memperbarui data film yang sudah ada."
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 Add Review to Movie (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"score\": 9.5,\n  \"comment\": \"Visual luar biasa dan alur cerita yang sangat megah!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/movies/{{movie_id}}/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movies",
+                "{{movie_id}}",
+                "reviews"
+              ]
+            },
+            "description": "Menambahkan ulasan film. Penulis review otomatis menggunakan nama user yang sedang login."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+
