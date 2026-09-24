@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <!-- ===================================================================== -->
-    <!-- INHERIT QWEB REPORT SALE ORDER (sale.report_saleorder_document)       -->
-    <!-- Menambahkan informasi persentase & nominal komisi sales               -->
+    <!-- BAGIAN 1: INHERIT QWEB REPORT EXISTING ODOO                           -->
+    <!-- Meng-inherit template bawaan Odoo: sale.report_saleorder_document     -->
     <!-- ===================================================================== -->
     <template id="report_saleorder_document_inherit_commission" inherit_id="sale.report_saleorder_document">
         
-        <!-- 1. Tambah Informasi Komisi di Blok Header Informasi Order -->
+        <!-- 1. Injeksi informasi komisi ke dalam blok header informasi order (id="informations") -->
         <xpath expr="//div[@id='informations']" position="inside">
             <div t-if="doc.commision_percent" class="col-auto col-3 mw-100 mb-2" name="commision_info">
                 <strong>Sales Commission:</strong>
                 <p class="m-0">
-                    <span t-field="doc.commision_percent"/>%
+                    <span class="badge text-bg-primary" style="font-size: 0.95em;">
+                        <span t-field="doc.commision_percent"/>%
+                    </span>
                 </p>
             </div>
         </xpath>
 
-        <!-- 2. Tambah Rincian Komisi di Bawah Total Ringkasan Penjualan -->
+        <!-- 2. Injeksi ringkasan komisi di bawah total order (name="so_total_summary") -->
         <xpath expr="//div[@name='so_total_summary']" position="after">
-            <div t-if="doc.commision_nominal" class="row justify-content-end mt-2">
+            <div t-if="doc.commision_nominal" class="row justify-content-end mt-3">
                 <div class="col-6">
                     <table class="table table-sm table-bordered" style="page-break-inside: avoid; border-color: #dee2e6;">
                         <tr class="table-light">
@@ -32,8 +35,11 @@
                         </tr>
                         <tr>
                             <td><strong>Commission Nominal:</strong></td>
-                            <td class="text-end">
-                                <strong><span t-field="doc.commision_nominal"/></strong>
+                            <td class="text-end text-success font-weight-bold">
+                                <strong>
+                                    <span t-field="doc.commision_nominal" 
+                                          t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                </strong>
                             </td>
                         </tr>
                     </table>
@@ -42,5 +48,140 @@
         </xpath>
 
     </template>
-</odoo>
 
+    <!-- ===================================================================== -->
+    <!-- BAGIAN 2: DEDICATED REPORT ACTION (SLIP KOMISI SALES)                -->
+    <!-- Menambahkan opsi cetak baru khusus di menu Print Sale Order           -->
+    <!-- ===================================================================== -->
+    <record id="action_report_sale_commission_slip" model="ir.actions.report">
+        <field name="name">Slip Komisi Sales (PDF)</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">jpfa_sale_commision.report_sale_commission_slip</field>
+        <field name="report_file">jpfa_sale_commision.report_sale_commission_slip</field>
+        <field name="print_report_name">'Slip Komisi - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Template Dokumen Mandiri untuk Slip Komisi Sales -->
+    <template id="report_sale_commission_slip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2 class="text-primary font-weight-bold">SLIP PERHITUNGAN KOMISI SALES</h2>
+                                <h5 class="text-muted">Nomor Order: <span t-field="doc.name"/></h5>
+                            </div>
+                        </div>
+
+                        <!-- Info Sales & Customer -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <h5><strong>Informasi Penjualan:</strong></h5>
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td width="35%">Tanggal Order:</td>
+                                        <td><strong><span t-field="doc.date_order" t-options='{"widget": "date"}'/></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Salesperson:</td>
+                                        <td><strong><span t-field="doc.user_id.name"/></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Customer:</td>
+                                        <td><strong><span t-field="doc.partner_id.name"/></strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <h5><strong>Status &amp; Pembayaran:</strong></h5>
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td width="35%">Status Dokumen:</td>
+                                        <td><span class="badge text-bg-info"><span t-field="doc.state"/></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Nilai Order:</td>
+                                        <td>
+                                            <strong>
+                                                <span t-field="doc.amount_total" 
+                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Rincian Produk Terjual -->
+                        <h5 class="mt-4"><strong>Rincian Item Penjualan:</strong></h5>
+                        <table class="table table-sm table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Deskripsi Produk</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Harga Satuan</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.order_line" t-as="line">
+                                    <tr t-if="not line.display_type">
+                                        <td><span t-field="line.name"/></td>
+                                        <td class="text-end"><span t-field="line.product_uom_qty"/> <span t-field="line.product_uom.name"/></td>
+                                        <td class="text-end"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                        <td class="text-end"><span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Kotak Perhitungan Komisi -->
+                        <div class="row justify-content-end mt-4">
+                            <div class="col-6">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary text-white font-weight-bold text-center">
+                                        HASIL PERHITUNGAN KOMISI
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <table class="table table-sm table-borderless mb-0">
+                                            <tr>
+                                                <td>Persentase Komisi:</td>
+                                                <td class="text-end"><strong><span t-field="doc.commision_percent"/>%</strong></td>
+                                            </tr>
+                                            <tr class="border-top">
+                                                <td class="h5 font-weight-bold">Hak Komisi Sales:</td>
+                                                <td class="text-end h5 text-success font-weight-bold">
+                                                    <span t-field="doc.commision_nominal" 
+                                                          t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tanda Tangan -->
+                        <div class="row mt-5 pt-4 text-center">
+                            <div class="col-6">
+                                <p>Dibuat Oleh (Salesperson),</p>
+                                <br/><br/><br/>
+                                <p><strong>(<span t-field="doc.user_id.name"/>)</strong></p>
+                            </div>
+                            <div class="col-6">
+                                <p>Disetujui Oleh (Finance / Supervisor),</p>
+                                <br/><br/><br/>
+                                <p><strong>(_________________________)</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

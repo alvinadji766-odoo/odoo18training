@@ -1,0 +1,343 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "PokeAPI & Odoo 18 REST Training",
+    "description": "Koleksi Postman untuk menguji pemanggilan Public REST API (PokeAPI) dan Endpoint Internal Odoo API & Webhooks.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. PokeAPI (Public REST API)",
+      "description": "Endpoint publik resmi PokeAPI (pokeapi.co)",
+      "item": [
+        {
+          "name": "Get Pokemon by Name (Pikachu)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/pokemon/pikachu",
+              "protocol": "https",
+              "host": [
+                "pokeapi",
+                "co"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "pokemon",
+                "pikachu"
+              ]
+            },
+            "description": "Mengambil data lengkap Pikachu (stats, types, abilities, sprites)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pokemon by ID (Charizard - #6)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/pokemon/6",
+              "protocol": "https",
+              "host": [
+                "pokeapi",
+                "co"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "pokemon",
+                "6"
+              ]
+            },
+            "description": "Mengambil data Pokemon berdasarkan ID Pokédex Nasional"
+          },
+          "response": []
+        },
+        {
+          "name": "List Pokemons (Pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0",
+              "protocol": "https",
+              "host": [
+                "pokeapi",
+                "co"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "pokemon"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Jumlah record per halaman"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Index awal"
+                }
+              ]
+            },
+            "description": "Mendapatkan daftar nama Pokemon dengan pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pokemon Ability Detail (Static)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/ability/static",
+              "protocol": "https",
+              "host": [
+                "pokeapi",
+                "co"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "ability",
+                "static"
+              ]
+            },
+            "description": "Mengambil informasi kemampuan khusus Pokemon"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pokemon Species & Lore Text (Ditto)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/pokemon-species/ditto",
+              "protocol": "https",
+              "host": [
+                "pokeapi",
+                "co"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "pokemon-species",
+                "ditto"
+              ]
+            },
+            "description": "Mengambil deskripsi cerita / flavor text Pokemon"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Odoo Movie API (Internal Auth & Webhook)",
+      "description": "Endpoint internal Odoo dengan Autentikasi API Key & Webhook",
+      "item": [
+        {
+          "name": "GET Movies List (Authorized)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{odoo_api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/movies?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "movies"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Movies List (Unauthorized Test)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/movies",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "movies"
+              ]
+            },
+            "description": "Menguji penolakan HTTP 401 Unauthorized jika tanpa API Key"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Movie (Authorized)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Api-Key",
+                "value": "{{odoo_api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Interstellar\",\n  \"duration\": 169,\n  \"release_date\": \"2014-11-07\",\n  \"synopsis\": \"When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft.\",\n  \"rating\": \"5\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/movies",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "movies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook - Ping Health Check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Webhook-Secret",
+                "value": "{{webhook_secret}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"ping\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/webhook/movie",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhook",
+                "movie"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook - Inbound Auto Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Webhook-Secret",
+                "value": "{{webhook_secret}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"new_review\",\n  \"movie_id\": 1,\n  \"reviewer_name\": \"Postman Webhook Tester\",\n  \"score\": 5.0,\n  \"comment\": \"Automated review posted via Inbound Webhook!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/webhook/movie",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhook",
+                "movie"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8069",
+      "type": "string"
+    },
+    {
+      "key": "odoo_api_key",
+      "value": "jpfa-movie-secret-key-2024",
+      "type": "string"
+    },
+    {
+      "key": "webhook_secret",
+      "value": "jpfa-webhook-token-secret",
+      "type": "string"
+    }
+  ]
+}
+

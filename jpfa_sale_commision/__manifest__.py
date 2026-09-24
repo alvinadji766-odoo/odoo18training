@@ -10,7 +10,7 @@ Long description of the module's purpose
 """,
     'author': 'Japfa Odoo Dev',
     'website': 'https://odoo.com',
-    'depends': ['base', 'sale'],
+    'depends': ['base', 'sale', 'sale_management'],
     'data': [
         'security/ir.model.access.csv',
         'report/sale_report_templates.xml',

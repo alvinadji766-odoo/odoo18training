@@ -1,42 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Form -->
+    <!-- Custom Action -->
+    <record id="action_orders_custom" model="ir.actions.act_window">
+        <field name="name">Sales Orders Custom</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="sale.view_sales_order_filter"/>
+        <field name="context">{'search_default_commision_filter': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new quotation, the first step of a new sale!
+            </p><p>
+                Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+            </p>
+        </field>
+    </record>
+
+    <!-- Form View Inheritance -->
     <record id="view_order_form_commission" model="ir.ui.view">
         <field name="name">sale.order.form.commission</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <!-- 1. Group Commission di dekat Payment Term -->
             <xpath expr="//field[@name='payment_term_id']" position="after">
-                <group name="commision" string="Commision">
-                    <field name="commision_percent" invisible="0"/>
+                <group name="commision" string="Commision (Session 5)">
+                    <field name="commision_percent"/>
                     <field name="commision_nominal"/>
                     <button name="action_cancel" type="object" string="Cancel"/>
                 </group>
             </xpath>
 
+            <!-- 2. Notebook Page untuk Latihan Domain Many2many -->
             <xpath expr="//notebook" position="inside">
-                <page string="Commision">
+                <page string="Commision &amp; Domain M2M" name="commision_learning">
+                    <group>
+                        <group string="Latihan Domain based on Many2many">
+                            <field name="partner_tag_ids" widget="many2many_tags"
+                                   placeholder="Pilih tags customer..."/>
+                            <field name="partner_custom_id"
+                                   placeholder="Hanya muncul partner dengan tag di atas..."/>
+                        </group>
+                        <group string="Penjelasan Materi">
+                            <div class="text-muted" colspan="2">
+                                💡 <b>Domain based on Many2many:</b><br/>
+                                Field <code>partner_custom_id</code> memiliki domain:<br/>
+                                <code>domain="[('category_id', 'in', partner_tag_ids)]"</code><br/>
+                                <i>category_id</i> adalah field Many2many bawaan pada <code>res.partner</code> (Tags). Ketika Anda memilih tag di <b>partner_tag_ids</b>, dropdown <b>partner_custom_id</b> otomatis memfilter hanya partner yang memiliki relasi tag tersebut!
+                            </div>
+                        </group>
+                    </group>
                 </page>
             </xpath>
 
-            <!-- Tambah button -->
+            <!-- 3. Header Buttons untuk Testing -->
             <xpath expr="//header" position="inside">
-
                 <!-- button object -->
                 <button name="calculate_nominal" 
-                    string="Calculate Nominal" 
-                    type="object"
-                    invisible="1"/>
+                        string="Calculate Nominal" 
+                        type="object"
+                        invisible="1"/>
                 <!-- button action -->
                 <button name="%(action_orders_custom)d" 
-                    string="Test Button Action" 
-                    type="action"/>
+                        string="Test Button Action" 
+                        type="action"/>
+                
+                <button name="action_apply_loyalty_commission"
+                        string="⭐ Hitung Komisi Loyalitas (ORM)"
+                        type="object"
+                        class="btn-info"
+                        help="ORM Search &amp; Aggregasi: Cari total order confirmed customer ini sebelumnya"/>
+
+                <button name="action_find_similar_orders"
+                        string="🔍 Cari Order Serupa (Domain ORM)"
+                        type="object"
+                        class="btn-outline-primary"
+                        help="Dynamic Domain Builder menggunakan expression.OR &amp; expression.AND"/>
+
+                <button name="coba_orm" type="object" string="Test ORM (Slide 6-7)"/>
+                <button name="coba_query" type="object" string="Test SQL Query (Slide 8)"/>
             </xpath>
         </field>
     </record>
 
-    <!-- List -->
+    <!-- List View Inheritance -->
     <record id="view_order_list_commission" model="ir.ui.view">
         <field name="name">sale.order.list.commission</field>
         <field name="model">sale.order</field>
@@ -49,7 +97,7 @@
         </field>
     </record>
 
-    <!-- Kanban -->
+    <!-- Kanban View Inheritance -->
     <record id="view_sale_order_kanban" model="ir.ui.view">
         <field name="name">view_sale_order_kanban</field>
         <field name="model">sale.order</field>
@@ -62,40 +110,40 @@
         </field>
     </record>
 
-
-    <!-- Search View -->
+    <!-- Search View Inheritance: Latihan Domain Polish Notation & Operators (Slide 10, 12, 17) -->
     <record id="view_sales_order_filter" model="ir.ui.view">
         <field name="name">view_sales_order_filter</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <!-- Filter dasar -->
                 <filter string="Has Commision" domain="[('commision_percent', '!=', 0)]" name="commision_filter"/>
-            </xpath>            
-        </field>
-    </record>
+                
+                <!-- Explicit OR Operator ('|') (Slide 12) -->
+                <filter string="Draft or Confirmed (OR '|')" 
+                        domain="['|', ('state', '=', 'draft'), ('state', '=', 'sale')]" 
+                        name="filter_draft_or_sale"/>
 
-    <!-- Custom Action -->
-    <record id="action_orders_custom" model="ir.actions.act_window">
-        <field name="name">Sales Orders Custom</field>
-        <field name="res_model">sale.order</field>
-        <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
-        <field name="search_view_id" ref="sale.view_sales_order_filter"/>
-        <field name="context">{'search_default_commision_filter' : 1}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create a new quotation, the first step of a new sale!
-            </p><p>
-                Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
-            </p>
+                <!-- Negation NOT Operator ('!') (Slide 12) -->
+                <filter string="Not Cancelled (NOT '!')" 
+                        domain="['!', ('state', '=', 'cancel')]" 
+                        name="filter_not_cancel"/>
+
+                <!-- Comparison Operator dengan XML Escaped &gt; (Slide 14 & 17) -->
+                <filter string="High Commission (&gt; 10%)" 
+                        domain="[('commision_percent', '&gt;', 10)]" 
+                        name="filter_high_comm"/>
+            </xpath>            
         </field>
     </record>
 
     <!-- Custom Menu -->
     <menuitem id="menu_sale_custom"
-        name="Sale Custom"
-        parent="sale.sale_order_menu"
-        action="action_orders_custom" sequence="10"
-        groups="sales_team.group_sale_manager"/>
+              name="Sale Custom"
+              parent="sale.sale_order_menu"
+              action="action_orders_custom" 
+              sequence="10"
+              groups="sales_team.group_sale_manager"/>
 
 </odoo>

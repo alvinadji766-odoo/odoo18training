@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_pokemon_search" model="ir.ui.view">
+        <field name="name">pokemon.pokemon.search</field>
+        <field name="model">pokemon.pokemon</field>
+        <field name="arch" type="xml">
+            <search string="Search Pokemon">
+                <field name="name"/>
+                <field name="pokedex_id"/>
+                <field name="types"/>
+                <field name="abilities"/>
+                <filter name="has_image" string="Memiliki Gambar" domain="[('image', '!=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_types" string="Tipe Elemen" context="{'group_by': 'types'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- LIST / TREE VIEW -->
+    <record id="view_pokemon_list" model="ir.ui.view">
+        <field name="name">pokemon.pokemon.list</field>
+        <field name="model">pokemon.pokemon</field>
+        <field name="arch" type="xml">
+            <list string="Pokédex List" sample="1">
+                <field name="pokedex_id" string="#"/>
+                <field name="image" widget="image" options="{'size': [40, 40]}" optional="show"/>
+                <field name="name" string="Pokemon Name"/>
+                <field name="types" widget="badge"/>
+                <field name="abilities" optional="show"/>
+                <field name="hp" optional="show"/>
+                <field name="attack" optional="show"/>
+                <field name="defense" optional="show"/>
+                <field name="speed" optional="show"/>
+                <field name="height" optional="hide"/>
+                <field name="weight" optional="hide"/>
+                <field name="base_experience" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- KANBAN VIEW -->
+    <record id="view_pokemon_kanban" model="ir.ui.view">
+        <field name="name">pokemon.pokemon.kanban</field>
+        <field name="model">pokemon.pokemon</field>
+        <field name="arch" type="xml">
+            <kanban sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="pokedex_id"/>
+                <field name="types"/>
+                <field name="image"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-center p-2">
+                            <div class="me-3" style="width: 75px; height: 75px;">
+                                <field name="image" widget="image" options="{'size': [75, 75]}" class="img-thumbnail"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="text-muted small">#<field name="pokedex_id"/></div>
+                                <h5 class="mb-1 text-primary font-weight-bold"><field name="name"/></h5>
+                                <div><span class="badge rounded-pill text-bg-info"><field name="types"/></span></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_pokemon_form" model="ir.ui.view">
+        <field name="name">pokemon.pokemon.form</field>
+        <field name="model">pokemon.pokemon</field>
+        <field name="arch" type="xml">
+            <form string="Pokemon Profile">
+                <header>
+                    <button name="action_refetch_api" 
+                            string="🔄 Sync Ulang dari PokeAPI" 
+                            type="object" 
+                            class="btn-secondary" 
+                            help="Memperbarui data dan gambar langsung dari REST API"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    
+                    <!-- Sprite Image di sudut kanan atas -->
+                    <field name="image" widget="image" class="oe_avatar" options="{'preview_image': 'image', 'size': [128, 128]}"/>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="Nama Pokemon"/>
+                        <h1>
+                            <field name="name" placeholder="Misal: Pikachu"/>
+                        </h1>
+                        <h4>
+                            <span class="text-muted">Pokédex No. #</span>
+                            <field name="pokedex_id" class="d-inline" placeholder="1"/>
+                        </h4>
+                    </div>
+
+                    <group>
+                        <group string="Karakteristik &amp; Fisik">
+                            <field name="types" placeholder="Electric, Grass / Poison"/>
+                            <field name="abilities" placeholder="Static, Blaze, Overgrow"/>
+                            <field name="height"/>
+                            <field name="weight"/>
+                            <field name="base_experience"/>
+                            <field name="image_url" widget="url" optional="hide"/>
+                        </group>
+                        <group string="Battle Base Stats">
+                            <field name="hp"/>
+                            <field name="attack"/>
+                            <field name="defense"/>
+                            <field name="speed"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Catatan &amp; Detail" name="notes_page">
+                            <field name="notes" placeholder="Catatan tambahan mengenai Pokemon ini..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ACTION WINDOW -->
+    <record id="action_pokemon" model="ir.actions.act_window">
+        <field name="name">Pokédex</field>
+        <field name="res_model">pokemon.pokemon</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada Pokemon di Pokédex Anda!
+            </p>
+            <p>
+                Klik tombol <b>Fetch from PokeAPI</b> di menu atas untuk mengambil Pokemon dari REST API publik secara otomatis.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pokemon_fetch_wizard_form" model="ir.ui.view">
+        <field name="name">pokemon.fetch.wizard.form</field>
+        <field name="model">pokemon.fetch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Pokemon from REST API">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <strong>💡 Informasi:</strong> Wizard ini akan memanggil PokeAPI secara realtime (<code>https://pokeapi.co/api/v2/pokemon/{nama}</code>), mengunduh gambar sprite, dan menyimpannya sebagai record Pokédex.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="pokemon_query" placeholder="Contoh: pikachu, charizard, gengar, 25..."/>
+                            <field name="api_source" widget="radio"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_fetch_and_create" string="🚀 Ambil Data &amp; Simpan ke Odoo" type="object" class="btn-primary"/>
+                    <button string="Batal" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pokemon_fetch_wizard" model="ir.actions.act_window">
+        <field name="name">Fetch Pokemon from API</field>
+        <field name="res_model">pokemon.fetch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

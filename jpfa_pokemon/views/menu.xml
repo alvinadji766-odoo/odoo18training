@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- TOP MENU -->
+    <menuitem id="menu_pokemon_root"
+              name="Pokédex"
+              web_icon="base,static/description/icon.png"
+              sequence="25"/>
+
+    <!-- POKEDEX SUBMENU -->
+    <menuitem id="menu_pokemon_list"
+              name="All Pokemons"
+              parent="menu_pokemon_root"
+              action="action_pokemon"
+              sequence="10"/>
+
+    <!-- REST API WIZARD SUBMENU -->
+    <menuitem id="menu_pokemon_fetch_wizard"
+              name="🚀 Fetch from PokeAPI"
+              parent="menu_pokemon_root"
+              action="action_pokemon_fetch_wizard"
+              sequence="20"/>
+</odoo>

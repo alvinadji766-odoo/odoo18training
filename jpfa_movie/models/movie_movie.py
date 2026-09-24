@@ -1,5 +1,10 @@
+import json
+import logging
+import requests
 from odoo import api, fields, models, Command
 from odoo.exceptions import UserError, ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class MovieMovie(models.Model):
@@ -60,6 +65,11 @@ class MovieMovie(models.Model):
     avg_rating = fields.Float(compute='_compute_rating', store=True, digits=(3, 1), string='Avg Review Score')
     review_count = fields.Integer(compute='_compute_rating', store=True, string='Review Count')
     artist_count = fields.Integer(compute='_compute_artist_count', string='Artist Count')
+
+
+    # Studio Related
+    studio_name = fields.Char(related='studio_id.name')
+    country_id = fields.Many2one(related='studio_id.country_id')
 
     # ---------- compute ----------
     @api.depends('review_ids.score')
@@ -136,7 +146,70 @@ class MovieMovie(models.Model):
                 )
             rec.state = 'released'
             rec.message_post(body="Movie released.")
+            rec._trigger_outbound_webhook('movie.released')
 
     def action_back_draft(self):
         self.write({'state': 'draft'})
+
+    # =========================================================================
+    # OUTBOUND WEBHOOK: PUSH EVENT NOTIFICATION TO EXTERNAL SERVICES
+    # =========================================================================
+    def action_test_outbound_webhook(self):
+        """Tombol interaktif di form view untuk menguji pengiriman Webhook ke sistem luar."""
+        self.ensure_one()
+        self._trigger_outbound_webhook('movie.manual_test')
+
+    def _trigger_outbound_webhook(self, event_type='movie.released'):
+        """
+        Kirim HTTP POST Webhook ke URL eksternal saat ada kejadian di Odoo.
+        URL tujuan dibaca dari System Parameter: 'jpfa_movie.outbound_webhook_url'.
+        """
+        webhook_url = self.env['ir.config_parameter'].sudo().get_param('jpfa_movie.outbound_webhook_url')
+
+        for rec in self:
+            payload = {
+                'event': event_type,
+                'timestamp': fields.Datetime.now().isoformat(),
+                'movie': {
+                    'id': rec.id,
+                    'name': rec.name,
+                    'state': rec.state,
+                    'release_date': str(rec.release_date or ''),
+                    'duration': rec.duration,
+                    'rating_star': rec.rating,
+                    'avg_rating': rec.avg_rating,
+                    'genres': rec.genre_ids.mapped('name'),
+                }
+            }
+
+            if not webhook_url:
+                rec.message_post(
+                    body=(
+                        "📡 <b>Outbound Webhook Di-trigger (Simulasi):</b><br/>"
+                        "<i>URL Webhook belum diatur di System Parameters (<code>jpfa_movie.outbound_webhook_url</code>).</i><br/>"
+                        f"<pre style='background:#f4f4f4; padding:8px; border-radius:4px;'>{json.dumps(payload, indent=2)}</pre>"
+                    )
+                )
+                continue
+
+            try:
+                headers = {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Odoo-Movie-Webhook/18.0',
+                    'X-Webhook-Event': event_type,
+                }
+                res = requests.post(webhook_url, json=payload, headers=headers, timeout=5)
+                rec.message_post(
+                    body=(
+                        f"📡 <b>Outbound Webhook Berhasil Terkirim!</b><br/>"
+                        f"• Target Endpoint: <code>{webhook_url}</code><br/>"
+                        f"• HTTP Status Code: <b>{res.status_code}</b><br/>"
+                        f"• Event: <code>{event_type}</code>"
+                    )
+                )
+            except Exception as e:
+                _logger.warning("Gagal mengirim webhook untuk film %s: %s", rec.name, e)
+                rec.message_post(
+                    body=f"⚠️ <b>Gagal mengirim Webhook:</b> {str(e)} ke <code>{webhook_url}</code>"
+                )
 

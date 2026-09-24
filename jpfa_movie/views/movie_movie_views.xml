@@ -32,6 +32,8 @@
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_back_draft" string="Back to Draft" type="object"
                             invisible="state != 'released'"/>
+                    <button name="action_test_outbound_webhook" string="📡 Test Webhook" type="object"
+                            class="btn-secondary" help="Menguji pengiriman notifikasi Webhook ke sistem luar"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,released"/>
                 </header>
                 <sheet>

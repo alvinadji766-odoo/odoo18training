@@ -203,4 +203,25 @@
         <field name="score">10</field>
         <field name="comment">A breathtaking anime masterpiece by Studio Ghibli. Beautiful in every single frame.</field>
     </record>
+
+    <!-- ===================================================================== -->
+    <!-- SYSTEM PARAMETERS (CONFIG PARAMETER UNTUK REST API & WEBHOOK)         -->
+    <!-- ===================================================================== -->
+    <!-- 1. API Key untuk autentikasi request dari luar                        -->
+    <record id="config_param_jpfa_movie_api_key" model="ir.config_parameter">
+        <field name="key">jpfa_movie.api_key</field>
+        <field name="value">jpfa-movie-secret-key-2024</field>
+    </record>
+
+    <!-- 2. Webhook Secret Token untuk verifikasi Inbound Webhook              -->
+    <record id="config_param_jpfa_movie_webhook_secret" model="ir.config_parameter">
+        <field name="key">jpfa_movie.webhook_secret</field>
+        <field name="value">jpfa-webhook-token-secret</field>
+    </record>
+
+    <!-- 3. Target URL Outbound Webhook (Odoo -> Server Luar)                  -->
+    <record id="config_param_jpfa_movie_outbound_webhook_url" model="ir.config_parameter">
+        <field name="key">jpfa_movie.outbound_webhook_url</field>
+        <field name="value">https://webhook.site/demo-endpoint</field>
+    </record>
 </odoo>

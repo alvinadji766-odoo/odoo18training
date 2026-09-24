@@ -4,8 +4,10 @@
               web_icon="movie_catalog,static/description/icon.png"/>
 
     <menuitem id="menu_movie_main" name="Movies" parent="menu_movie_root" sequence="10"/>
-    <menuitem id="menu_movie_movie" name="Movies" parent="menu_movie_main"
-              action="action_movie_movie" sequence="10"/>
+    <menuitem id="menu_movie_movie"
+                name="Movies" parent="menu_movie_main"
+                action="action_movie_movie" 
+                sequence="10"/>
     <menuitem id="menu_movie_review" name="Reviews" parent="menu_movie_main"
               action="action_movie_review" sequence="20"/>
 
