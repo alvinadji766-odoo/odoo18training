@@ -454,7 +454,6 @@ class MovieSessionApiController(http.Controller):
             # Review dibuat atas nama user yang sedang login
             reviewer_name = request.env.user.name
             review = request.env['movie.review'].create({
-                'name': reviewer_name,
                 'movie_id': movie.id,
                 'score': float(score),
                 'comment': comment,
